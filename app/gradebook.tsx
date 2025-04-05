@@ -6,52 +6,39 @@ import {
   StyleSheet,
   ActivityIndicator,
   TouchableOpacity,
-  Image,
   ImageBackground,
+  Image,
 } from "react-native";
 import { ref, get } from "firebase/database";
 import { useNavigation } from "@react-navigation/native";
 import { db } from "../config/firebase";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import HambMenu from "@/components/HambMenu";
-const DebtsScreen = () => {
+import * as FileSystem from "expo-file-system";
+import * as Sharing from "expo-sharing";
+import { Asset } from "expo-asset";
+
+const GradebookScreen = () => {
   const [loading, setLoading] = useState(true);
   const nav = useNavigation();
   const [hambVis, setHambVis] = useState(false);
   const [hambPh, setHambPh] = useState("hamb");
-  const [debts, setDebts] = useState([]);
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    const day = date.getDate();
-    const month = date.toLocaleDateString("ru-RU", {
-      month: "numeric",
-    });
-    return (
-      <View>
-        <Text
-          style={{
-            fontSize: 30,
-            fontFamily: "Roboto",
-            color: "white",
-          }}
-        >
-          {day}.{month}
-        </Text>
-      </View>
-    );
-  };
+  const [gradebookData, setGradebookData] = useState([]);
+
   useEffect(() => {
-    const fetchDebts = async () => {
+    const fetchGradebook = async () => {
       try {
         const userId = await AsyncStorage.getItem("uniqueid");
-        const debtsRef = ref(db, `debts/${userId}`);
-        const snapshot = await get(debtsRef);
-        if (snapshot.exists()) {
-          const debtsData = Object.entries(snapshot.val())
-            .map(([key, value]) => ({ id: key, ...value }))
-            .filter((item) => item.status === "Активно");
+        const gradebookRef = ref(db, `gradebook/${userId}`);
+        const snapshot = await get(gradebookRef);
 
-          setDebts(debtsData);
+        if (snapshot.exists()) {
+          const data = snapshot.val();
+          const gradebookArray = Object.entries(data).map(([key, value]) => ({
+            type: key,
+            ...value,
+          }));
+          setGradebookData(gradebookArray);
         }
         setLoading(false);
       } catch (error) {
@@ -59,42 +46,64 @@ const DebtsScreen = () => {
         setLoading(false);
       }
     };
-    fetchDebts();
+    fetchGradebook();
   }, []);
-  const renderDebtItem = ({ item }) => (
-    <View
-      style={{
-        backgroundColor: "#DB4B38",
-        width: "100%",
-        height: 75,
-        borderRadius: 15,
-        display: "flex",
-        padding: 15,
-      }}
-    >
-      <View
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "space-around",
-          gap: 10,
-          alignItems: "center",
-        }}
+
+  const handleDownload = async (fileurl) => {
+    try {
+      const fileMap: { [key: string]: any } = {
+        "lecture.pdf": require("../assets/files/lecture.pdf"),
+      };
+      if (!fileMap[fileurl]) {
+        throw new Error("Файл не найден");
+      }
+      const asset = Asset.fromModule(fileMap[fileurl]);
+      await asset.downloadAsync();
+
+      const fileUri = FileSystem.cacheDirectory + fileurl;
+      await FileSystem.copyAsync({
+        from: asset.localUri,
+        to: fileUri,
+      });
+
+      if (await Sharing.isAvailableAsync()) {
+        await Sharing.shareAsync(fileUri);
+      } else {
+        alert("Файл доступен по пути: " + fileUri);
+      }
+    } catch (error) {
+      console.error("Ошибка скачивания:", error);
+      alert("Не удалось открыть файл");
+    }
+  };
+
+  const renderGradebookItem = ({ item }) => (
+    <View style={styles.itemContainer}>
+      <Text style={styles.title}>
+        {item.type === "exams" ? "Экзамены" : "Зачеты"}
+      </Text>
+      <Text style={styles.date}>{item.date}</Text>
+      <TouchableOpacity
+        style={styles.downloadButton}
+        onPress={() => handleDownload(item.fileurl)}
       >
-        <Text> {formatDate(item.date)}</Text>
-        <Text style={{ fontFamily: "Roboto", fontSize: 30, color: "white" }}>
-          {item.title}
-        </Text>
-      </View>
+        <Image
+          source={require("../assets/images/icons/download.png")}
+          style={{ width: 25, height: 25 }}
+        />
+      </TouchableOpacity>
     </View>
   );
+
   if (loading) {
     return <ActivityIndicator size="large" style={styles.loader} />;
   }
+
   const hambHandler = () => {
     setHambVis(!hambVis);
-    setHambPh(hambPh == "hamb" ? "cross" : "hamb");
+    setHambPh(hambPh === "hamb" ? "cross" : "hamb");
   };
+
   return (
     <ImageBackground
       source={require("../assets/images/bcg1.png")}
@@ -105,7 +114,7 @@ const DebtsScreen = () => {
           <TouchableOpacity onPress={hambHandler}>
             <Image
               source={
-                hambPh == "hamb"
+                hambPh === "hamb"
                   ? require("../assets/images/icons/hamb.png")
                   : require("../assets/images/icons/cross.png")
               }
@@ -127,25 +136,17 @@ const DebtsScreen = () => {
           </TouchableOpacity>
         </View>
         <View style={styles.body}>
-          {hambVis == true ? <HambMenu /> : null}
-          <View style={{ display: "flex", flexDirection: "column", gap: 25 }}>
-            <Text
-              style={{
-                fontSize: 30,
-                fontFamily: "Roboto",
-                width: "100%",
-              }}
-            >
-              Задолженности
-            </Text>
+          {hambVis && <HambMenu />}
+          <View style={{ flex: 1 }}>
+            <Text style={styles.screenTitle}>Зачетная книжка</Text>
             <FlatList
-              data={debts}
-              renderItem={renderDebtItem}
-              keyExtractor={(item) => item.id}
+              data={gradebookData}
+              renderItem={renderGradebookItem}
+              keyExtractor={(item, index) => index.toString()}
               contentContainerStyle={styles.listContent}
               ListEmptyComponent={
-                <Text style={{ fontFamily: "Roboto", fontSize: 20 }}>
-                  Нет активных задолженностей 🎉
+                <Text style={styles.emptyText}>
+                  Нет данных по зачетам и экзаменам
                 </Text>
               }
             />
@@ -202,6 +203,7 @@ const DebtsScreen = () => {
     </ImageBackground>
   );
 };
+
 const styles = StyleSheet.create({
   background: {
     flex: 1,
@@ -212,18 +214,65 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
   },
-  listContent: {
-    display: "flex",
-    flexDirection: "column",
-    width: "100%",
-    gap: 10,
-  },
   container: {
+    flex: 1,
+  },
+  header: {
+    display: "flex",
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 40,
+    paddingBottom: 30,
+  },
+  body: {
     display: "flex",
     flexDirection: "column",
+    justifyContent: "space-around",
+    height: "80%",
+    paddingHorizontal: 20,
+  },
+  itemContainer: {
+    backgroundColor: "#f5f5f5",
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
-    width: "100%",
-    height: "100%",
+    borderRadius: 10,
+    padding: 20,
+    marginBottom: 15,
+  },
+  title: {
+    fontSize: 22,
+    fontFamily: "Roboto",
+  },
+  date: {
+    fontSize: 10,
+    color: "#666",
+  },
+  downloadButton: {
+    padding: 10,
+    borderRadius: 5,
+    alignSelf: "flex-start",
+  },
+  downloadText: {
+    color: "white",
+    fontSize: 16,
+  },
+  screenTitle: {
+    fontSize: 28,
+    fontFamily: "Roboto",
+    marginBottom: 20,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: "#666",
+    textAlign: "center",
+    marginTop: 20,
+  },
+  listContent: {
+    paddingBottom: 20,
   },
   bpTxt: {
     fontFamily: "Roboto",
@@ -248,31 +297,6 @@ const styles = StyleSheet.create({
     height: 40,
     objectFit: "contain",
   },
-  loader: {
-    marginTop: 50,
-  },
-  header: {
-    display: "flex",
-    width: "100%",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: 40,
-    paddingBottom: 30,
-  },
-  body: {
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "space-between",
-    width: "95%",
-    height: "81%",
-  },
-  headerContainer: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
 });
 
-export default DebtsScreen;
+export default GradebookScreen;

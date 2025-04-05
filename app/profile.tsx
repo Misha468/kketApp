@@ -168,45 +168,45 @@ const ProfileScreen = () => {
               )}
             />
           </View>
-          <View style={styles.bottomPart}>
-            <TouchableOpacity
-              style={styles.bpTO}
-              onPress={() =>
-                nav.reset({
-                  index: 0,
-                  routes: [{ name: "schedule" }],
-                })
-              }
-            >
-              <Image
-                source={require("../assets/images/icons/schedule.png")}
-                style={styles.bpImage}
-              />
-              <Text style={styles.bpTxt}>Расписание</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.bpTO}
-              onPress={() =>
-                nav.reset({
-                  index: 0,
-                  routes: [{ name: "chats" }],
-                })
-              }
-            >
-              <Image
-                source={require("../assets/images/icons/chats.png")}
-                style={styles.bpImage}
-              />
-              <Text style={styles.bpTxt}>Чаты</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.bpTO}>
-              <Image
-                source={require("../assets/images/icons/profile.png")}
-                style={styles.bpImage}
-              />
-              <Text style={styles.bpTxt}>Профиль</Text>
-            </TouchableOpacity>
-          </View>
+        </View>
+        <View style={styles.bottomPart}>
+          <TouchableOpacity
+            style={styles.bpTO}
+            onPress={() =>
+              nav.reset({
+                index: 0,
+                routes: [{ name: "schedule" }],
+              })
+            }
+          >
+            <Image
+              source={require("../assets/images/icons/schedule.png")}
+              style={styles.bpImage}
+            />
+            <Text style={styles.bpTxt}>Расписание</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.bpTO}
+            onPress={() =>
+              nav.reset({
+                index: 0,
+                routes: [{ name: "chats" }],
+              })
+            }
+          >
+            <Image
+              source={require("../assets/images/icons/chats.png")}
+              style={styles.bpImage}
+            />
+            <Text style={styles.bpTxt}>Чаты</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.bpTO}>
+            <Image
+              source={require("../assets/images/icons/profile.png")}
+              style={styles.bpImage}
+            />
+            <Text style={styles.bpTxt}>Профиль</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </ImageBackground>
@@ -220,13 +220,15 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "column",
     justifyContent: "space-between",
+    width: "100%",
+    height: "100%",
   },
   container: {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    height: "95%",
-    justifyContent: "space-between",
+    width: "100%",
+    height: "100%",
   },
   bpTxt: {
     fontFamily: "Roboto",
@@ -240,8 +242,9 @@ const styles = StyleSheet.create({
   body: {
     display: "flex",
     flexDirection: "column",
-    justifyContent: "space-around",
+    gap: 25,
     width: "90%",
+    height: "80%",
   },
   profile: {
     display: "flex",
@@ -250,8 +253,10 @@ const styles = StyleSheet.create({
     gap: 5,
   },
   bottomPart: {
+    position: "absolute",
+    bottom: 25,
+    marginHorizontal: "auto",
     width: "100%",
-    marginTop: 25,
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-around",
@@ -285,7 +290,6 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
   infoContainer: {
-    marginBottom: 25,
     display: "flex",
     flexDirection: "column",
     gap: 15,

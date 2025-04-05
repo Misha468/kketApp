@@ -143,45 +143,45 @@ const ChatListScreen = () => {
               <Text style={styles.emptyText}>Нет активных чатов</Text>
             }
           />
-          <View style={styles.bottomPart}>
-            <TouchableOpacity
-              style={styles.bpTO}
-              onPress={() =>
-                nav.reset({
-                  index: 0,
-                  routes: [{ name: "schedule" }],
-                })
-              }
-            >
-              <Image
-                source={require("../assets/images/icons/schedule.png")}
-                style={styles.bpImage}
-              />
-              <Text style={styles.bpTxt}>Расписание</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.bpTO}>
-              <Image
-                source={require("../assets/images/icons/chats.png")}
-                style={styles.bpImage}
-              />
-              <Text style={styles.bpTxt}>Чаты</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.bpTO}
-              onPress={() =>
-                nav.reset({
-                  index: 0,
-                  routes: [{ name: "profile" }],
-                })
-              }
-            >
-              <Image
-                source={require("../assets/images/icons/profile.png")}
-                style={styles.bpImage}
-              />
-              <Text style={styles.bpTxt}>Профиль</Text>
-            </TouchableOpacity>
-          </View>
+        </View>
+        <View style={styles.bottomPart}>
+          <TouchableOpacity
+            style={styles.bpTO}
+            onPress={() =>
+              nav.reset({
+                index: 0,
+                routes: [{ name: "schedule" }],
+              })
+            }
+          >
+            <Image
+              source={require("../assets/images/icons/schedule.png")}
+              style={styles.bpImage}
+            />
+            <Text style={styles.bpTxt}>Расписание</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.bpTO}>
+            <Image
+              source={require("../assets/images/icons/chats.png")}
+              style={styles.bpImage}
+            />
+            <Text style={styles.bpTxt}>Чаты</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.bpTO}
+            onPress={() =>
+              nav.reset({
+                index: 0,
+                routes: [{ name: "profile" }],
+              })
+            }
+          >
+            <Image
+              source={require("../assets/images/icons/profile.png")}
+              style={styles.bpImage}
+            />
+            <Text style={styles.bpTxt}>Профиль</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </ImageBackground>
@@ -191,17 +191,18 @@ const ChatListScreen = () => {
 const styles = StyleSheet.create({
   background: {
     flex: 1,
-    backgroundColor: "white",
     resizeMode: "cover",
     display: "flex",
     flexDirection: "column",
     justifyContent: "space-between",
+    width: "100%",
   },
   container: {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    height: "95%",
+    height: "100%",
+    width: "100%",
   },
   bpTxt: {
     fontFamily: "Roboto",
@@ -226,12 +227,14 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "column",
     justifyContent: "space-around",
-    width: "90%",
-    height: "85%",
+    width: "95%",
+    height: "80%",
   },
   bottomPart: {
+    position: "absolute",
+    bottom: 25,
+    marginHorizontal: "auto",
     width: "100%",
-    marginTop: 25,
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-around",

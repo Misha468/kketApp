@@ -42,7 +42,7 @@ const MainScreen = () => {
     return days[dayIndex];
   };
   useEffect(() => {
-    if (user && user.role === "Студент" && user.uid) {
+    if (user && user.role && user.uid) {
       const debtsRef = ref(db, `debts/${user.uid}`);
       const unsubscribe = onValue(debtsRef, (snapshot) => {
         const debtsData = snapshot.val();
@@ -135,69 +135,69 @@ const MainScreen = () => {
         </View>
         <View style={styles.body}>
           {hambVis == true ? <HambMenu /> : null}
-          <View style={styles.topPart}>
-            <View style={styles.topPartText}>
-              <Text style={{ fontSize: 20, fontFamily: "Roboto" }}>
-                Успеваемость
-              </Text>
-              <Text style={{ fontSize: 20, fontFamily: "Roboto" }}>
-                {roleText[user?.role] || ""}
-              </Text>
-            </View>
-            <PerformanceTracker />
-          </View>
+          {user?.role === "Студент" ? (
+            <>
+              <View style={styles.topPart}>
+                <View style={styles.topPartText}>
+                  <Text style={{ fontSize: 20, fontFamily: "Roboto" }}>
+                    Успеваемость
+                  </Text>
+                  <Text style={{ fontSize: 20, fontFamily: "Roboto" }}>
+                    {roleText[user?.role] || ""}
+                  </Text>
+                </View>
+                <PerformanceTracker />
+              </View>
+            </>
+          ) : null}
           <View style={styles.middlePart}>
             <View>
-              {user?.role === "Студент" && (
-                <>
-                  {activeDebts.length > 0 ? (
-                    <FlatList
-                      data={activeDebts}
-                      renderItem={({ item }) => (
-                        <View style={styles.debtItem}>
-                          <Text
-                            style={{
-                              textAlign: "center",
-                              fontFamily: "Roboto",
-                              fontSize: 18,
-                              backgroundColor: "#d9d9d9",
-                              borderRadius: 7,
-                              paddingLeft: 10,
-                              paddingRight: 10,
-                            }}
-                          >
-                            {getDebtTypeName(item.type)}
-                          </Text>
-                          <View
-                            style={{
-                              display: "flex",
-                              flexDirection: "row",
-                              alignItems: "center",
-                              justifyContent: "space-around",
-                              width: "100%",
-                            }}
-                          >
-                            <View
-                              style={{
-                                display: "flex",
-                                flexDirection: "column",
-                                alignItems: "center",
-                              }}
-                            >
-                              {formatDate(item.date)}
-                            </View>
-                            <Text style={styles.debtTitle}>
-                              {getShortTitle(item.title)}
-                            </Text>
-                          </View>
+              {activeDebts.length > 0 ? (
+                <FlatList
+                  data={activeDebts}
+                  renderItem={({ item }) => (
+                    <View style={styles.debtItem}>
+                      <Text
+                        style={{
+                          textAlign: "center",
+                          fontFamily: "Roboto",
+                          fontSize: 18,
+                          backgroundColor: "#d9d9d9",
+                          borderRadius: 7,
+                          paddingLeft: 10,
+                          paddingRight: 10,
+                        }}
+                      >
+                        {getDebtTypeName(item.type)}
+                      </Text>
+                      <View
+                        style={{
+                          display: "flex",
+                          flexDirection: "row",
+                          alignItems: "center",
+                          justifyContent: "space-around",
+                          width: "100%",
+                        }}
+                      >
+                        <View
+                          style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                          }}
+                        >
+                          {formatDate(item.date)}
                         </View>
-                      )}
-                      keyExtractor={(item, index) => index.toString()}
-                    />
-                  ) : (
-                    <Text>Нет активных задолженностей</Text>
+                        <Text style={styles.debtTitle}>
+                          {getShortTitle(item.title)}
+                        </Text>
+                      </View>
+                    </View>
                   )}
-                </>
+                  keyExtractor={(item, index) => index.toString()}
+                />
+              ) : (
+                <Text>Нет активных задолженностей</Text>
               )}
             </View>
             <View style={styles.schedule}>
@@ -221,53 +221,53 @@ const MainScreen = () => {
               )}
             </View>
           </View>
-          <View style={styles.bottomPart}>
-            <TouchableOpacity
-              style={styles.bpTO}
-              onPress={() =>
-                nav.reset({
-                  index: 0,
-                  routes: [{ name: "schedule" }],
-                })
-              }
-            >
-              <Image
-                source={require("../assets/images/icons/schedule.png")}
-                style={styles.bpImage}
-              />
-              <Text style={styles.bpTxt}>Расписание</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.bpTO}
-              onPress={() =>
-                nav.reset({
-                  index: 0,
-                  routes: [{ name: "chats" }],
-                })
-              }
-            >
-              <Image
-                source={require("../assets/images/icons/chats.png")}
-                style={styles.bpImage}
-              />
-              <Text style={styles.bpTxt}>Чаты</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.bpTO}
-              onPress={() =>
-                nav.reset({
-                  index: 0,
-                  routes: [{ name: "profile" }],
-                })
-              }
-            >
-              <Image
-                source={require("../assets/images/icons/profile.png")}
-                style={styles.bpImage}
-              />
-              <Text style={styles.bpTxt}>Профиль</Text>
-            </TouchableOpacity>
-          </View>
+        </View>
+        <View style={styles.bottomPart}>
+          <TouchableOpacity
+            style={styles.bpTO}
+            onPress={() =>
+              nav.reset({
+                index: 0,
+                routes: [{ name: "schedule" }],
+              })
+            }
+          >
+            <Image
+              source={require("../assets/images/icons/schedule.png")}
+              style={styles.bpImage}
+            />
+            <Text style={styles.bpTxt}>Расписание</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.bpTO}
+            onPress={() =>
+              nav.reset({
+                index: 0,
+                routes: [{ name: "chats" }],
+              })
+            }
+          >
+            <Image
+              source={require("../assets/images/icons/chats.png")}
+              style={styles.bpImage}
+            />
+            <Text style={styles.bpTxt}>Чаты</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.bpTO}
+            onPress={() =>
+              nav.reset({
+                index: 0,
+                routes: [{ name: "profile" }],
+              })
+            }
+          >
+            <Image
+              source={require("../assets/images/icons/profile.png")}
+              style={styles.bpImage}
+            />
+            <Text style={styles.bpTxt}>Профиль</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </View>
@@ -302,19 +302,24 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     justifyContent: "space-between",
     height: "100%",
+    width: "100%",
   },
   container: {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
     height: "100%",
-    padding: 40,
+    width: "100%",
   },
   bpTxt: {
     fontFamily: "Roboto",
     fontSize: 13,
   },
   bottomPart: {
+    position: "absolute",
+    bottom: 25,
+    marginHorizontal: "auto",
+    width: "100%",
     display: "flex",
     flexDirection: "row",
     justifyContent: "space-around",
@@ -350,8 +355,8 @@ const styles = StyleSheet.create({
   body: {
     display: "flex",
     flexDirection: "column",
-    justifyContent: "space-around",
-    height: "95%",
+    gap: 50,
+    height: "80%",
   },
   header: {
     display: "flex",
@@ -359,6 +364,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    padding: 40,
   },
   topPart: {
     backgroundColor: "#F7E15C",

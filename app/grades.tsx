@@ -15,10 +15,10 @@ import { db } from "../config/firebase";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import HambMenu from "@/components/HambMenu";
 const gradeImages = {
-    low: require("../assets/images/grades/bad.png"),
-    medium: require("../assets/images/grades/ok.png"),
-    high: require("../assets/images/grades/best.png"),
-  };
+  low: require("../assets/images/grades/bad.png"),
+  medium: require("../assets/images/grades/ok.png"),
+  high: require("../assets/images/grades/best.png"),
+};
 const GradesScreen = () => {
   const [loading, setLoading] = useState(true);
   const nav = useNavigation();
@@ -84,11 +84,12 @@ const GradesScreen = () => {
     if (average >= 3.6 && average <= 4.5) return gradeImages.medium;
     if (average > 4.5) return gradeImages.high;
     return gradeImages.low;
-  };  const renderSubjectItem = ({ item }) => (
+  };
+  const renderSubjectItem = ({ item }) => (
     <TouchableOpacity
       onPress={() => {
         setLoading(false);
-        navigation.navigate("subjectdetails", {
+        nav.navigate("subjectdetails", {
           subject: {
             id: item.id,
             name: item.name,
@@ -96,16 +97,16 @@ const GradesScreen = () => {
         });
       }}
     >
-      <ImageBackground
-        source={item.image}
-        style={styles.subjectCard}
-        imageStyle={styles.cardImage}
-      >
-        <View style={styles.cardContent}>
-          <Text style={styles.subjectName}>{item.name}</Text>
+      <View style={styles.subjectCard}>
+        <Text style={styles.subjectName}>{item.name}</Text>
+        <ImageBackground
+          source={item.image}
+          style={styles.subject}
+          imageStyle={styles.cardImage}
+        >
           <Text style={styles.subjectAverage}>{item.average}</Text>
-        </View>
-      </ImageBackground>
+        </ImageBackground>
+      </View>
     </TouchableOpacity>
   );
   if (loading) {
@@ -116,7 +117,10 @@ const GradesScreen = () => {
     setHambPh(hambPh == "hamb" ? "cross" : "hamb");
   };
   return (
-    <View style={styles.background}>
+    <ImageBackground
+      source={require("../assets/images/bcg1.png")}
+      style={styles.background}
+    >
       <View style={styles.container}>
         <View style={styles.header}>
           <TouchableOpacity onPress={hambHandler}>
@@ -145,57 +149,70 @@ const GradesScreen = () => {
         </View>
         <View style={styles.body}>
           {hambVis == true ? <HambMenu /> : null}
-
-          <View style={styles.bottomPart}>
-            <TouchableOpacity
-              style={styles.bpTO}
-              onPress={() =>
-                nav.reset({
-                  index: 0,
-                  routes: [{ name: "schedule" }],
-                })
+          <View style={{ display: "flex", flexDirection: "column", gap: 25 }}>
+            <Text style={{ fontFamily: "Roboto", fontSize: 30 }}>
+              Итоговые оценки
+            </Text>
+            <FlatList
+              data={subjects}
+              renderItem={renderSubjectItem}
+              keyExtractor={(item) => item.id}
+              contentContainerStyle={styles.list}
+              ListEmptyComponent={
+                <Text style={styles.emptyText}>Нет данных об оценках</Text>
               }
-            >
-              <Image
-                source={require("../assets/images/icons/schedule.png")}
-                style={styles.bpImage}
-              />
-              <Text style={styles.bpTxt}>Расписание</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.bpTO}
-              onPress={() =>
-                nav.reset({
-                  index: 0,
-                  routes: [{ name: "chats" }],
-                })
-              }
-            >
-              <Image
-                source={require("../assets/images/icons/chats.png")}
-                style={styles.bpImage}
-              />
-              <Text style={styles.bpTxt}>Чаты</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.bpTO}
-              onPress={() =>
-                nav.reset({
-                  index: 0,
-                  routes: [{ name: "profile" }],
-                })
-              }
-            >
-              <Image
-                source={require("../assets/images/icons/profile.png")}
-                style={styles.bpImage}
-              />
-              <Text style={styles.bpTxt}>Профиль</Text>
-            </TouchableOpacity>
+            />
           </View>
         </View>
+        <View style={styles.bottomPart}>
+          <TouchableOpacity
+            style={styles.bpTO}
+            onPress={() =>
+              nav.reset({
+                index: 0,
+                routes: [{ name: "schedule" }],
+              })
+            }
+          >
+            <Image
+              source={require("../assets/images/icons/schedule.png")}
+              style={styles.bpImage}
+            />
+            <Text style={styles.bpTxt}>Расписание</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.bpTO}
+            onPress={() =>
+              nav.reset({
+                index: 0,
+                routes: [{ name: "chats" }],
+              })
+            }
+          >
+            <Image
+              source={require("../assets/images/icons/chats.png")}
+              style={styles.bpImage}
+            />
+            <Text style={styles.bpTxt}>Чаты</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.bpTO}
+            onPress={() =>
+              nav.reset({
+                index: 0,
+                routes: [{ name: "profile" }],
+              })
+            }
+          >
+            <Image
+              source={require("../assets/images/icons/profile.png")}
+              style={styles.bpImage}
+            />
+            <Text style={styles.bpTxt}>Профиль</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    </ImageBackground>
   );
 };
 const styles = StyleSheet.create({
@@ -207,6 +224,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     justifyContent: "space-between",
     width: "100%",
+    height: "100%",
   },
   listContent: {
     display: "flex",
@@ -214,11 +232,15 @@ const styles = StyleSheet.create({
     width: "100%",
     gap: 10,
   },
+  subjectName: {
+    fontFamily: "Roboto",
+    fontSize: 20,
+  },
   container: {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    height: "auto",
+    height: "100%",
     width: "100%",
   },
   bpTxt: {
@@ -226,6 +248,9 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   bottomPart: {
+    position: "absolute",
+    bottom: 25,
+    marginHorizontal: "auto",
     width: "100%",
     display: "flex",
     flexDirection: "row",
@@ -265,6 +290,37 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+  },
+  subjectCard: {
+    width: "100%",
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    backgroundColor: "#e3e3e3",
+    height: 60,
+    alignItems: "center",
+    borderRadius: 15,
+    padding: 10,
+  },
+  list: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 10,
+  },
+  subject: {
+    width: 50,
+    height: 50,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  cardImage: {
+    borderRadius: 10,
+  },
+  subjectAverage: {
+    fontFamily: "Roboto",
+    fontSize: 25,
+    color: "white",
   },
 });
 

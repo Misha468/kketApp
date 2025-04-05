@@ -10,9 +10,10 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import "react-native-reanimated";
 import { UserProvider } from "../config/UserContext";
-
+import MainScreen from "./main";
+import LectionScreen from "./lection";
 import { useColorScheme } from "@/hooks/useColorScheme";
-
+import { MenuProvider } from "react-native-popup-menu";
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
@@ -34,12 +35,16 @@ export default function RootLayout() {
 
   return (
     <UserProvider>
-      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-        <Stack screenOptions={{ headerShown: false, gestureEnabled: false }}>
-          <Stack.Screen name="+not-found" />
-        </Stack>
-        <StatusBar style="auto" />
-      </ThemeProvider>
+      <MenuProvider>
+        <ThemeProvider
+          value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+        >
+          <Stack screenOptions={{ headerShown: false, gestureEnabled: false }}>
+            <Stack.Screen name="+not-found" />
+          </Stack>
+          <StatusBar style="auto" />
+        </ThemeProvider>
+      </MenuProvider>
     </UserProvider>
   );
 }

@@ -11,7 +11,7 @@ import {
 import { useUser } from "../config/UserContext";
 import { db } from "../config/firebase";
 import { ref, push, set, get } from "firebase/database";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, CommonActions } from "@react-navigation/native";
 const avatars = [
   {
     id: "default",
@@ -127,7 +127,22 @@ const HambMenu = () => {
         {menuItems.map((item) => (
           <TouchableOpacity
             key={item.id}
-            onPress={() => nav.navigate(item.link)}
+            onPress={() => {
+              const rootState = nav.getState();
+              const routeExists = rootState.routeNames.includes(item.link);
+
+              if (routeExists) {
+                nav.dispatch(
+                  CommonActions.reset({
+                    index: 0,
+                    routes: [{ name: item.link }],
+                  })
+                );
+              } else {
+                console.error(`Маршрут "${item.link}" не найден`);
+                nav.navigate("not-found");
+              }
+            }}
           >
             <Text style={styles.text}>{item.name}</Text>
           </TouchableOpacity>
@@ -160,7 +175,7 @@ const styles = StyleSheet.create({
   },
   people: {
     display: "flex",
-    flexDirection: "row",
+    flexDirection: "column",
     gap: 10,
     alignItems: "center",
     marginLeft: 20,
